@@ -18,8 +18,7 @@ import {
   type Client,
   type Ref,
   type TxOperations,
-  getCollaborativeDoc,
-  getCollaborativeDocId
+  makeCollaborativeDoc
 } from '@hcengineering/core'
 import { type Document, type Teamspace, documentId } from '@hcengineering/document'
 import { getMetadata, translate } from '@hcengineering/platform'
@@ -38,11 +37,10 @@ export async function createEmptyDocument (
   data: Partial<Pick<AttachedData<Document>, 'name' | 'icon' | 'color'>> = {}
 ): Promise<void> {
   const name = await translate(document.string.Untitled, {})
-  const collaborativeDocId = getCollaborativeDocId(id, 'content')
 
   const object: AttachedData<Document> = {
     name,
-    content: getCollaborativeDoc(collaborativeDocId),
+    content: makeCollaborativeDoc(id, 'content'),
     attachments: 0,
     children: 0,
     embeddings: 0,

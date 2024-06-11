@@ -36,7 +36,7 @@ class NoSuchKeyError extends Error {
 export class AggregatorStorageAdapter implements StorageAdapter, StorageAdapterEx {
   constructor (
     readonly adapters: Map<string, StorageAdapter>,
-    readonly defaultAdapter: string, // Adapter will be used to put new documents into
+    readonly defaultAdapter: string, // Adapter will be used to put new documents into, if not matched by content type
     readonly dbAdapter: RawDBAdapter
   ) {}
 
@@ -202,6 +202,24 @@ export class AggregatorStorageAdapter implements StorageAdapter, StorageAdapterE
     return await provider.read(ctx, workspaceId, stat.storageId)
   }
 
+  selectProvider (forceProvider: string | undefined, contentType: string): StorageAdapter | undefined {
+    if (forceProvider !== undefined) {
+      return this.adapters.get(forceProvider)
+    }
+    // try select provider based on content type matching.
+    for (const adapter of this.adapters.values()) {
+      if (adapter.contentTypes === undefined) {
+        continue
+      }
+      if (adapter.contentTypes.some((it) => contentType.includes(it))) {
+        // we have matched content type for adapter.
+        return adapter
+      }
+    }
+
+    return this.adapters.get(this.defaultAdapter)
+  }
+
   async put (
     ctx: MeasureContext,
     workspaceId: WorkspaceId,
@@ -221,7 +239,7 @@ export class AggregatorStorageAdapter implements StorageAdapter, StorageAdapterE
       )
     ).shift()
 
-    const provider = this.adapters.get(stat?.provider ?? this.defaultAdapter)
+    const provider = this.selectProvider(stat?.provider, contentType)
     if (provider === undefined) {
       throw new NoSuchKeyError('No such provider found')
     }

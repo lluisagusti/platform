@@ -3,8 +3,6 @@
 [![X (formerly Twitter) Follow](https://img.shields.io/twitter/follow/huly_io?style=for-the-badge)](https://x.com/huly_io)
 ![GitHub License](https://img.shields.io/github/license/hcengineering/platform?style=for-the-badge)
 
-⭐️ Your star shines on us. Star us on GitHub!
-
 ## About
 
 The Huly Platform is a robust framework designed to accelerate the development of business applications, such as CRM systems. 
